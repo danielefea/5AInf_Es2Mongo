@@ -89,6 +89,21 @@ let server = http.createServer(function(req, res){
             ];
             aggregate(res, "voti", op);
             break;
+        
+        case "/q8":
+            //Select * from persone
+            find(res, "persone", {}, {});
+            break;
+        
+        case "/u1":
+            updateOne(res, "persone", {_id:"7"}, {$set:{nome:"Giuseppe Maria", cognome:"Bianchi"}});
+            break;
+
+        case "/u2":
+            replaceOne(res, "persone", {_id:"7"}, {nome:"Giuseppe"});
+            break;
+
+        
 
         case "/i1":
             insertMany(res, "persone", 
@@ -299,6 +314,38 @@ function insertMany(res, col, array){
         });
         promise.catch(function(err){
             obj = { cod:-2, desc:"Errore nell'inserimento"}
+            res.end(JSON.stringify(obj));
+            conn.close();
+        });
+    });
+}
+
+function updateOne(res, col, where, modifica){
+    creaConnessione(database, res, function(conn, db){
+        let promise = db.collection(col).updateOne(where, modifica); 
+        promise.then(function(ris){
+            json = { cod:1, desc:"Update effettuata", ris };
+            res.end(JSON.stringify(json));
+            conn.close();
+        });
+        promise.catch(function(err){
+            obj = { cod:-2, desc:"Errore nell'update"}
+            res.end(JSON.stringify(obj));
+            conn.close();
+        });
+    });
+}
+
+function replaceOne(res, col, where, nuovoOggetto){
+    creaConnessione(database, res, function(conn, db){
+        let promise = db.collection(col).replaceOne(where, nuovoOggetto); 
+        promise.then(function(ris){
+            json = { cod:1, desc:"Update effettuata", ris };
+            res.end(JSON.stringify(json));
+            conn.close();
+        });
+        promise.catch(function(err){
+            obj = { cod:-2, desc:"Errore nell'update"}
             res.end(JSON.stringify(obj));
             conn.close();
         });
